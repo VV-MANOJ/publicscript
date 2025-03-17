@@ -32,13 +32,6 @@ if ! command -v aws &> /dev/null; then
     exit
 fi
 
-# Check for Helm
-if ! command -v helm &> /dev/null; then
-    echo "Error: Helm not found. Please install Helm version 3 or later."
-    echo "Install it from: https://helm.sh/docs/intro/install/"
-    echo "Verify with: helm version --short"
-    exit 1
-fi
 
 
 
