@@ -15,3 +15,4 @@ apk add --no-cache \
     groff \
     python3 \
     py3-pip
+sleep 300
