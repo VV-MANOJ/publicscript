@@ -40,14 +40,7 @@ if ! command -v helm &> /dev/null; then
     exit 1
 fi
 
-# Check Helm version (must be v3 or later)
-HELM_VERSION=$(helm version --short | cut -d ' ' -f2 | cut -d '+' -f1)
-if [[ ! "$HELM_VERSION" =~ ^v3 ]]; then
-    echo "Error: Helm version 3 or later is required."
-    echo "Current version: $HELM_VERSION"
-    echo "Install Helm v3+ from: https://helm.sh/docs/intro/install/"
-    exit 1
-fi
+
 
 # Check for kubectl
 if ! command -v kubectl &> /dev/null; then
