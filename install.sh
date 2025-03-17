@@ -422,18 +422,14 @@ echo "Current context: $CONTEXT"
 #The Availability Zone with the most nodes is: $max_zone
 max_zone=$(kubectl get nodes --output=json | jq -r '.items | group_by(.metadata.labels["failure-domain.beta.kubernetes.io/zone"]) | map({zone: .[0].metadata.labels["failure-domain.beta.kubernetes.io/zone"], count: length}) | max_by(.count) | .zone')
 
-# Parse cluster information from context
-if [[ $CONTEXT =~ arn:aws:eks:([^:]+):([^:]+):cluster/(.+) ]]; then
-    REGION=${BASH_REMATCH[1]}
-    ACCOUNT_ID=${BASH_REMATCH[2]}
-    CLUSTER_NAME=${BASH_REMATCH[3]}
-    ESCAPED_ACCOUNT_ID="\"${ACCOUNT_ID}\""
-else
-    echo "Error: Unable to parse cluster information from context."
-    echo "Expected format: arn:aws:eks:<region>:<account-id>:cluster/<cluster-name>"
-    echo "Set correct context: kubectl config use-context <cluster-name>"
-    exit 1
-fi
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+echo "AWS Account ID: $ACCOUNT_ID"
+REGION=$(curl -s 169.254.169.254/latest/meta-data/placement/region)
+CLUSTER_NAME=$(aws eks list-clusters --region $AWS_REGION --query "clusters[0]" --output text)
+echo "EKS Cluster Name: $CLUSTER_NAME"
+echo "Fetching OIDC URL..."
+OIDC_URL=$(aws eks describe-cluster --name "$CLUSTER_NAME" --region "$REGION" --query "cluster.identity.oidc.issuer" --output text)
+echo "OIDC URL $OIDC_URL"
 echo "Cluster: $CLUSTER_NAME (Account: $ACCOUNT_ID, Region: $REGION)"
 
 # Get OIDC issuer
