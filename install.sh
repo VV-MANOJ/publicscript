@@ -57,7 +57,7 @@ ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 echo "AWS Account ID: $ACCOUNT_ID"
 REGION=$(curl -s 169.254.169.254/latest/meta-data/placement/region)
 CLUSTER_NAME=$(aws eks list-clusters --region $REGION --query "clusters[0]" --output text)
-echo "EKS Cluster Name: $CLUSTER_NAME"
+echo "EKS Cluster Name $CLUSTER_NAME"
 echo "Fetching OIDC URL..."
 OIDC_URL=$(aws eks describe-cluster --name "$CLUSTER_NAME" --region "$REGION" --query "cluster.identity.oidc.issuer" --output text)
 echo "OIDC URL $OIDC_URL"
