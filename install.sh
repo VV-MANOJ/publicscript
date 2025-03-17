@@ -15,7 +15,7 @@ apk add --no-cache \
     groff \
     python3 \
     py3-pip
-set -e
+
 
 RELEASE_VERSION="0.0.1-beta.10"
 IMAGE_TAG="v0.0.1-beta.10"
