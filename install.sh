@@ -92,6 +92,7 @@ max_zone=$(kubectl get nodes --output=json | jq -r '.items | group_by(.metadata.
 
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 echo "AWS Account ID: $ACCOUNT_ID"
+sleep 200
 REGION=$(curl -s 169.254.169.254/latest/meta-data/placement/region)
 CLUSTER_NAME=$(aws eks list-clusters --region $REGION --query "clusters[0]" --output text)
 echo "EKS Cluster Name $CLUSTER_NAME"
