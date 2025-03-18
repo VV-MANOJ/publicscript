@@ -86,7 +86,7 @@ if [ -z "$IAM_ARN" ]; then
     echo "Error: IAM ARN cannot be empty."
     exit 1
 fi
-
+sleep 300
 #namespace validation
 if kubectl get namespace onelens-agent &> /dev/null; then
     echo "Warning: Namespace 'onelens-agent' already exists."
