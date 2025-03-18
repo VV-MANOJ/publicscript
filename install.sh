@@ -81,7 +81,7 @@ echo ""
 # Step 3: Prompt user to register payload in Onelens
 echo "Step 3: Copy the above payload and register it in Onelens."
 echo "Finally, enter the IAM ARN for the tenant when you are done."
-read -p "IAM ARN: " IAM_ARN
+IAM_ARN="arn:aws:iam::609916866699:role/onelens-kubernetes-agent-role-manoj_test_account"
 if [ -z "$IAM_ARN" ]; then
     echo "Error: IAM ARN cannot be empty."
     exit 1
