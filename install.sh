@@ -77,7 +77,7 @@ echo "Step 2: Generating cluster payload..."
 echo "Generated payload:"
 echo "  $PAYLOAD"
 echo ""
-
+sleep 300
 # Step 3: Prompt user to register payload in Onelens
 echo "Step 3: Copy the above payload and register it in Onelens."
 echo "Finally, enter the IAM ARN for the tenant when you are done."
