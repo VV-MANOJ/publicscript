@@ -90,18 +90,6 @@ fi
 #namespace validation
 if kubectl get namespace onelens-agent &> /dev/null; then
     echo "Warning: Namespace 'onelens-agent' already exists."
-    if kubectl get deployment onelens-agent -n onelens-agent &> /dev/null; then
-        echo "Seems like 'onelens-agent' is already deployed."
-        echo "We are patching with the latest release."
-    else
-        echo "This may cause conflicts with the installation."
-        read -p "Proceed anyway? (y/n): " PROCEED
-        if [ "$PROCEED" != "y" ]; then
-            echo "Exiting. Please remove or clean the 'onelens-agent' namespace and rerun the script."
-            echo "Delete namespace: kubectl delete namespace onelens-agent"
-            exit 1
-        fi
-    fi
 else
     echo "Namespace 'onelens-agent' does not exist. Creating namespace..."
     kubectl create namespace onelens-agent
