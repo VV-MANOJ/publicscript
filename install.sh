@@ -82,15 +82,15 @@ REGION=$(curl -s -H "X-aws-ec2-metadata-token: $(curl -s -X PUT http://169.254.1
 
 CLUSTER_NAME=$CLUSTER_NAME
 
-# Step 2: Generate cluster payload
-PAYLOAD="$CLUSTER_NAME@$ACCOUNT_ID:$REGION@$OIDC_ISSUER"
-echo "Step 2: Generating cluster payload..."
-echo "Generated payload:"
-echo "  $PAYLOAD"
-echo ""
-# Step 3: Prompt user to register payload in Onelens
-# echo "Step 3: Copy the above payload and register it in Onelens."
-# echo "Finally, enter the IAM ARN for the tenant when you are done."
+# # Step 2: Generate cluster payload
+# PAYLOAD="$CLUSTER_NAME@$ACCOUNT_ID:$REGION@$OIDC_ISSUER"
+# echo "Step 2: Generating cluster payload..."
+# echo "Generated payload:"
+# echo "  $PAYLOAD"
+# echo ""
+# # Step 3: Prompt user to register payload in Onelens
+# # echo "Step 3: Copy the above payload and register it in Onelens."
+# # echo "Finally, enter the IAM ARN for the tenant when you are done."
 IAM_ARN="arn:aws:iam::609916866699:role/onelens-kubernetes-agent-role-manoj_test_account"
 if [ -z "$IAM_ARN" ]; then
     echo "Error: IAM ARN cannot be empty."
