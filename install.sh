@@ -19,7 +19,7 @@ apk add --no-cache \
 
 RELEASE_VERSION="0.0.1-beta.10"
 IMAGE_TAG="v0.0.1-beta.10"
-TENANT_NAME="tenant"
+TENANT_NAME="$TENANT_NAME"
 
 # Step 0: Checking prerequisites
 echo "Step 0: Checking prerequisites..."
