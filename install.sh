@@ -71,12 +71,6 @@ if ! command -v kubectl &> /dev/null; then
     exit 1
 fi
 
-# Check AWS configuration
-if ! aws sts get-caller-identity &> /dev/null; then
-    echo "Error: AWS CLI is not configured. Please run 'aws configure' to set up your credentials."
-    echo "Run: aws configure"
-    exit 1
-fi
 
 
 #The Availability Zone with the most nodes is: $max_zone
