@@ -187,7 +187,6 @@ helm upgrade --install onelens-agent -n onelens-agent --create-namespace oci://p
     --set onelens-agent.env.TENANT_NAME="$TENANT_NAME" \
     --set-string onelens-agent.env.ACCOUNT_ID=${ACCOUNT_ID} \
     --set onelens-agent.env.AWS_CLUSTER_REGION="$REGION" \
-    --set onelens-agent.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"="$IAM_ARN" \
     --set onelens-agent.image.repository=public.ecr.aws/w7k6q5m9/onelens-agent \
     --set onelens-agent.image.tag="$IMAGE_TAG" \
     --set onelens-agent.storageClass.az=$max_zone \
