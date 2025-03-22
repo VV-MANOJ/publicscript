@@ -144,29 +144,6 @@ echo "Persistent storage for Prometheus is ENABLED by default."
 # Step 6: Deploy the Onelens Agent via Helm
 echo "Step 6: Deploying Onelens Agent..."
 
-echo "Checking for system:masters group membership..."
-if ! kubectl auth can-i '*' '*' --all-namespaces &> /dev/null; then
-    echo "Warning: Limited permissions detected. system:masters group membership is recommended."
-    echo "Some helm chart installations might fail without sufficient permissions."
-    echo "To get full permissions, contact your cluster administrator to add you to the system:masters group."
-    echo "Example command for admin to run:"
-    echo "  kubectl edit configmap aws-auth -n kube-system"
-    echo "And add your user ARN to the mapUsers section with system:masters group:"
-    echo "  mapUsers:"
-    echo "    - userarn: arn:aws:iam::<account-id>:user/<username>"
-    echo "      username: <username>"
-    echo "      groups:"
-    echo "        - system:masters"
-    read -p "Do you want to proceed anyway? (y/n): " PROCEED
-    if [ "$PROCEED" != "y" ]; then
-        echo "Installation aborted. Please obtain necessary permissions and try again."
-        exit 1
-    fi
-    echo "Proceeding with limited permissions..."
-else
-    echo "system:masters group membership verified."
-fi
-
 login_to_ecr_public() {
     echo "Logging into AWS ECR Public Registry..."
 
