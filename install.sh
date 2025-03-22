@@ -71,7 +71,6 @@ if ! command -v kubectl &> /dev/null; then
     exit 1
 fi
 
-echo "check manoj"
 
 
 #The Availability Zone with the most nodes is: $max_zone
@@ -81,23 +80,7 @@ ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 echo "AWS Account ID: $ACCOUNT_ID"
 REGION=$(curl -s -H "X-aws-ec2-metadata-token: $(curl -s -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 60')" http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
 
-
-#CLUSTER_NAME=$(curl -s -H "X-aws-ec2-metadata-token: $(curl -s -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 60')" http://169.254.169.254/latest/meta-data/tags/instance/eks:cluster-name)
-
-CLUSTER_NAME=$(aws eks list-clusters --region $REGION --query "clusters[0]" --output text)
-echo "EKS Cluster Name $CLUSTER_NAME"
-echo "Fetching OIDC URL..."
-OIDC_URL=$(aws eks describe-cluster --name "$CLUSTER_NAME" --region "$REGION" --query "cluster.identity.oidc.issuer" --output text)
-echo "OIDC URL $OIDC_URL"
-echo "Cluster: $CLUSTER_NAME (Account: $ACCOUNT_ID, Region: $REGION)"
-#sleep 200
-# Get OIDC issuer
-OIDC_ISSUER=$(aws eks describe-cluster --name "$CLUSTER_NAME" --query 'cluster.identity.oidc.issuer' --output text)
-if [ -z "$OIDC_ISSUER" ]; then
-    echo "Error: Unable to retrieve OIDC issuer."
-    echo "Ensure AWS CLI has permissions to describe the cluster and the cluster name is correct."
-    exit 1
-fi
+CLUSTER_NAME=$CLUSTER_NAME
 
 # Step 2: Generate cluster payload
 PAYLOAD="$CLUSTER_NAME@$ACCOUNT_ID:$REGION@$OIDC_ISSUER"
