@@ -105,13 +105,13 @@ echo "Generated payload:"
 echo "  $PAYLOAD"
 echo ""
 # Step 3: Prompt user to register payload in Onelens
-echo "Step 3: Copy the above payload and register it in Onelens."
-echo "Finally, enter the IAM ARN for the tenant when you are done."
-IAM_ARN="arn:aws:iam::609916866699:role/onelens-kubernetes-agent-role-manoj_test_account"
-if [ -z "$IAM_ARN" ]; then
-    echo "Error: IAM ARN cannot be empty."
-    exit 1
-fi
+# echo "Step 3: Copy the above payload and register it in Onelens."
+# echo "Finally, enter the IAM ARN for the tenant when you are done."
+# IAM_ARN="arn:aws:iam::609916866699:role/onelens-kubernetes-agent-role-manoj_test_account"
+# if [ -z "$IAM_ARN" ]; then
+#     echo "Error: IAM ARN cannot be empty."
+#     exit 1
+# fi
 
 #namespace validation
 if kubectl get namespace onelens-agent &> /dev/null; then
@@ -208,7 +208,7 @@ EOF
 }
 
 # Run the access check
-check_access
+#check_access
 
 check_ebs_driver() {
     echo "Checking if EBS CSI driver is installed..."
@@ -414,12 +414,6 @@ if ! command -v kubectl &> /dev/null; then
     exit 1
 fi
 
-# Check AWS configuration
-if ! aws sts get-caller-identity &> /dev/null; then
-    echo "Error: AWS CLI is not configured. Please run 'aws configure' to set up your credentials."
-    echo "Run: aws configure"
-    exit 1
-fi
 
 # Step 1: Fetching current EKS context
 echo "Step 1: Fetching current EKS context..."
