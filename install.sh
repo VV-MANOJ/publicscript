@@ -24,15 +24,7 @@ TENANT_NAME="tenant"
 # Step 0: Checking prerequisites
 echo "Step 0: Checking prerequisites..."
 
-# Check for AWS CLI
-if ! command -v aws &> /dev/null; then
-    echo "Error: AWS CLI not found. Please install AWS CLI to proceed."
-    echo "Install it from: https://aws.amazon.com/cli/"
-    echo "Verify with: aws --version"
-    exit
-fi
 
-#!/bin/bash
 
 # Define versions
 HELM_VERSION="v3.13.2"  # Replace with latest version if needed
