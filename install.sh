@@ -94,7 +94,8 @@ ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 echo "AWS Account ID: $ACCOUNT_ID"
 REGION=$(curl -s -H "X-aws-ec2-metadata-token: $(curl -s -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 60')" http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
 sleep 200
-CLUSTER_NAME=$(curl -s -H "X-aws-ec2-metadata-token: $(curl -s -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 60')" http://169.254.169.254/latest/meta-data/tags/instance/eks:cluster-name)
+
+#CLUSTER_NAME=$(curl -s -H "X-aws-ec2-metadata-token: $(curl -s -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 60')" http://169.254.169.254/latest/meta-data/tags/instance/eks:cluster-name)
 
 #CLUSTER_NAME=$(aws eks list-clusters --region $REGION --query "clusters[0]" --output text)
 echo "EKS Cluster Name $CLUSTER_NAME"
