@@ -71,6 +71,7 @@ if ! command -v kubectl &> /dev/null; then
     exit 1
 fi
 
+echo "check manoj"
 
 
 #The Availability Zone with the most nodes is: $max_zone
