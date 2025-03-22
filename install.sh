@@ -90,7 +90,7 @@ echo "Fetching OIDC URL..."
 OIDC_URL=$(aws eks describe-cluster --name "$CLUSTER_NAME" --region "$REGION" --query "cluster.identity.oidc.issuer" --output text)
 echo "OIDC URL $OIDC_URL"
 echo "Cluster: $CLUSTER_NAME (Account: $ACCOUNT_ID, Region: $REGION)"
-sleep 200
+#sleep 200
 # Get OIDC issuer
 OIDC_ISSUER=$(aws eks describe-cluster --name "$CLUSTER_NAME" --query 'cluster.identity.oidc.issuer' --output text)
 if [ -z "$OIDC_ISSUER" ]; then
@@ -122,94 +122,6 @@ else
     kubectl create namespace onelens-agent
 fi
 
-# Function to cleanup test resources
-cleanup_test_resources() {
-    echo "Cleaning up test resources..."
-    kubectl delete pod permissions-test -n onelens-agent --ignore-not-found
-    kubectl delete serviceaccount onelens-agent-sa -n onelens-agent --ignore-not-found
-}
-cleanup_test_resources
-# Function to check S3  access
-check_access() {
-    local start_time=$(date +%s)
-    local end_time=$((start_time + 80))
-    local check_interval=10
-
-    echo "Creating test service account in onelens-agent namespace..."
-
-    # Create service account with the IAM role annotation
-    cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: onelens-agent-sa
-  namespace: onelens-agent
-  annotations:
-    eks.amazonaws.com/role-arn: ${IAM_ARN}
-EOF
-
-    echo "Creating test pod to verify S3 ..."
-    cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: Pod
-metadata:
-  name: permissions-test
-  namespace: onelens-agent
-spec:
-  serviceAccountName: onelens-agent-sa
-  containers:
-  - name: aws-cli
-    image: amazon/aws-cli:latest
-    command:
-    - /bin/sh
-    - -c
-    - |
-      aws s3 ls s3://onelens-kubernetes-agent/$TENANT_NAME &&
-      sleep 30 &&
-      echo "success" > /tmp/result ||
-      echo "failed" > /tmp/result
-    volumeMounts:
-    - name: result
-      mountPath: /tmp
-  volumes:
-  - name: result
-    emptyDir: {}
-EOF
-
-    echo "Checking S3 access permissions..."
-    echo "This will retry for 60 seconds, checking every 10 seconds..."
-
-    while [ $(date +%s) -lt $end_time ]; do
-        if kubectl wait --for=condition=ready pod/permissions-test -n onelens-agent --timeout=5s &> /dev/null; then
-            result=$(kubectl exec -n onelens-agent permissions-test -- cat /tmp/result 2>/dev/null || echo "pending")
-
-            if [ "$result" = "success" ]; then
-                echo "✓ S3 access verified"
-                echo "All required permissions are now available!"
-                cleanup_test_resources
-                return 0
-            elif [ "$result" = "failed" ]; then
-                echo "✗ Permission check failed"
-                echo "Waiting for permissions to propagate..."
-                sleep $check_interval
-            fi
-        fi
-        echo "Waiting for test pod to complete..."
-        sleep $check_interval
-    done
-
-    echo "Error: Failed to verify S3  after 60 seconds."
-    echo "Please verify the following:"
-    echo "1. The IAM role has the required permissions:"
-    echo "   - S3: s3:GetObject, s3:PutObject, s3:ListBucket"
-    echo "2. The IAM role trust relationship allows the service account to assume the role"
-    echo "3. The OIDC provider is properly configured for the cluster"
-    cleanup_test_resources
-    exit 1
-}
-
-# Run the access check
-#check_access
 
 check_ebs_driver() {
     echo "Checking if EBS CSI driver is installed..."
@@ -224,24 +136,8 @@ check_ebs_driver() {
     fi
 }
 
-# Step 4: Check for Persistent Volume (PVC) access
-PVC_ENABLED=false
-echo "Please decide whether you want to enable persistent storage for Prometheus or not."
-echo "Options:"
-echo "1. Proceed without PV (risk of data loss if Prometheus pod restarts before data export)."
-echo "2. Set up PV and retry."
-read -p "Enter your choice (1/2): " PVC_CHOICE
-
-if [ "$PVC_CHOICE" = "1" ]; then
-    echo "Remember: Data loss will happen if Prometheus pod restarts before data export."
-elif [ "$PVC_CHOICE" = "2" ]; then
-    check_ebs_driver
-    PVC_ENABLED=true
-else
-    echo "Invalid choice, exiting."
-    exit 1
-fi
-
+PVC_ENABLED=true
+echo "Persistent storage for Prometheus is ENABLED by default."
 
 
 
@@ -283,42 +179,13 @@ login_to_ecr_public() {
     fi
 }
 
-#!/bin/sh
-set -eux
-
-# Install dependencies
-apk add --no-cache \
-    curl \
-    tar \
-    gzip \
-    bash \
-    git \
-    unzip \
-    wget \
-    jq \
-    less \
-    groff \
-    python3 \
-    py3-pip
-set -e
-
-RELEASE_VERSION="0.0.1-beta.10"
-IMAGE_TAG="v0.0.1-beta.10"
-TENANT_NAME=$1
-
-# Step 0: Checking prerequisites
-echo "Step 0: Checking prerequisites..."
-
-# Check for AWS CLI
-login_to_ecr_public
-
 
 # Deploy the Helm chart
 helm upgrade --install onelens-agent -n onelens-agent --create-namespace oci://public.ecr.aws/w7k6q5m9/helm-charts/onelens-agent  --version $RELEASE_VERSION \
     --set onelens-agent.env.CLUSTER_NAME="$CLUSTER_NAME" \
     --set prometheus-opencost-exporter.opencost.exporter.defaultClusterId="$CLUSTER_NAME" \
     --set onelens-agent.env.TENANT_NAME="$TENANT_NAME" \
-    --set onelens-agent.env.ACCOUNT_ID=$ESCAPED_ACCOUNT_ID \
+    --set-string onelens-agent.env.ACCOUNT_ID=${ACCOUNT_ID} \
     --set onelens-agent.env.AWS_CLUSTER_REGION="$REGION" \
     --set onelens-agent.serviceAccount.annotations."eks\.amazonaws\.com/role-arn"="$IAM_ARN" \
     --set onelens-agent.image.repository=public.ecr.aws/w7k6q5m9/onelens-agent \
